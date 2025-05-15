@@ -39,17 +39,27 @@ async function showForecast(latlng) {
     let jsondata = await response.json();
     console.log(jsondata);
     let details  = jsondata.properties.timeseries[0].data.instant.details;
+    let timestamp = new Date(jsondata.properties.meta.updated_at);
     //Popup erzeugen
     let markup = `
     <ul>
+    Vorhersage für ${timestamp.toLocaleString()} Uhr
         <li>Luftdruck (hPa): ${details.air_pressure_at_sea_level}</li>
         <li>Lufttemperature (°C): ${details.air_temperature}</li>
         <li>Bewölkungsgrad (%): ${details.cloud_area_fraction}</li>
         <li>Luftfeuchtigkeit: ${details.relative_humidity}</li>
         <li>Windrichtung (°): ${details.wind_from_direction}</li>
         <li>Windgeschwindigkeit (km/h): ${details.wind_speed*3.6}</li>
-    </ul>`
+    </ul>`;
 
+    
+    //Wettericons für die nächten 24 stunden in 3 stunden schritten
+    for (let i=0; i<=24; i+=3) {
+        let symbol = jsondata.properties.timeseries[i].data.next_1_hours.summary.symbol_code
+        console.log(symbol);
+        let time = new Date(jsondata.properties.timeseries[i].time);
+        markup += `<img src= "icons/${symbol}.svg" style="width: 32px; height: 32px;" title = "${time.toLocaleString(time)}">`;
+    }
     
 
     L.popup([
