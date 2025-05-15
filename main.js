@@ -31,11 +31,10 @@ L.control.scale({
 }).addTo(map);
 
 // Ortname von latlong über  OpenStreetMap reverse geocoging erstellen
-async function getPlaceName(latlng) {
-    let url = `https://nominatim.openstreetmap.org/reverse?lat=${latlng.lat}&lon=${latlng.lng}&zoom=15&format=jsonv2`
+async function getPlaceName(url) {
     let response = await fetch(url);
     let jsondata = await response.json();
-    console.log(jsondata);
+    //console.log(jsondata);
     return jsondata.display_name;
 }
 
@@ -43,47 +42,55 @@ async function getPlaceName(latlng) {
 
 // MET NOrway Vorhersage visualisieren
 async function showForecast(latlng) {
-    
+
     let url = `https://api.met.no/weatherapi/locationforecast/2.0/compact?lat=${latlng.lat}&lon=${latlng.lng}`;
     let response = await fetch(url);
     let jsondata = await response.json();
-    console.log(jsondata);
-    let details  = jsondata.properties.timeseries[0].data.instant.details;
+    //console.log(jsondata);
+    let details = jsondata.properties.timeseries[0].data.instant.details;
     let timestamp = new Date(jsondata.properties.meta.updated_at);
+    let locurl = `https://nominatim.openstreetmap.org/reverse?lat=${latlng.lat}&lon=${latlng.lng}&zoom=15&format=jsonv2`
+
     //Popup erzeugen
     let markup = `
     <ul>
     <h3>Vorhersage für ${timestamp.toLocaleString()} Uhr</h3>
-        <small>Ort: ${await getPlaceName(latlng)}</small>
+        <small>Ort: ${await getPlaceName(locurl)}</small>
         <li>Luftdruck (hPa): ${details.air_pressure_at_sea_level}</li>
         <li>Lufttemperature (°C): ${details.air_temperature}</li>
         <li>Bewölkungsgrad (%): ${details.cloud_area_fraction}</li>
         <li>Luftfeuchtigkeit: ${details.relative_humidity}</li>
         <li>Windrichtung (°): ${details.wind_from_direction}</li>
-        <li>Windgeschwindigkeit (km/h): ${details.wind_speed*3.6}</li>
+        <li>Windgeschwindigkeit (km/h): ${details.wind_speed * 3.6}</li>
     </ul>`;
 
-    
+
     //Wettericons für die nächten 24 stunden in 3 stunden schritten
-    for (let i=0; i<=24; i+=3) {
+    for (let i = 0; i <= 24; i += 3) {
         let symbol = jsondata.properties.timeseries[i].data.next_1_hours.summary.symbol_code
-        console.log(symbol);
+        //console.log(symbol);
         let time = new Date(jsondata.properties.timeseries[i].time);
         markup += `<img src= "icons/${symbol}.svg" style="width: 32px; height: 32px;" title = "${time.toLocaleString(time)}">`;
+
     }
+        // Links zu den JSON-Daten
+    markup += `<p>
+            <a href="${url}" target="forecast">Daten zum Downloaden</a> |
+            <a href="${locurl}" target="forecast">OSM Details zum Ort</a>
+            </p>`;
     
 
     L.popup([
-        latlng.lat, latlng.lng 
+        latlng.lat, latlng.lng
     ], {
         content: markup
     }).openOn(overlays.forecast);
 }
 
 // auf Kartenklick reagieren
-map.on("click", function(evt) {    
+map.on("click", function (evt) {
     showForecast(evt.latlng);
 })
 
 // Klick auf Innsbruck simulieren
-map.fire("click", {latlng: {lat: ibk.lat, lng: ibk.lng,}})
+map.fire("click", { latlng: { lat: ibk.lat, lng: ibk.lng, } })
