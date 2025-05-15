@@ -31,7 +31,8 @@ L.control.scale({
 }).addTo(map);
 
 // Ortname von latlong über  OpenStreetMap reverse geocoging erstellen
-async function getPlaceName(url) {
+async function getPlaceName(latlng) {
+    let url = `https://nominatim.openstreetmap.org/reverse?lat=${latlng.lat}&lon=${latlng.lng}&zoom=15&format=jsonv2`
     let response = await fetch(url);
     let jsondata = await response.json();
     
@@ -52,7 +53,8 @@ async function showForecast(latlng) {
     //Popup erzeugen
     let markup = `
     <ul>
-    Vorhersage für ${timestamp.toLocaleString()} Uhr
+    <h3>Vorhersage für ${timestamp.toLocaleString()} Uhr</h3>
+        <small>Ort: ${await getPlaceName(latlng)}</small>
         <li>Luftdruck (hPa): ${details.air_pressure_at_sea_level}</li>
         <li>Lufttemperature (°C): ${details.air_temperature}</li>
         <li>Bewölkungsgrad (%): ${details.cloud_area_fraction}</li>
