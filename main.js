@@ -30,6 +30,15 @@ L.control.scale({
     imperial: false,
 }).addTo(map);
 
+// Ortname von latlong über  OpenStreetMap reverse geocoging erstellen
+async function getPlaceName(url) {
+    let response = await fetch(url);
+    let jsondata = await response.json();
+    
+    return jsondata.display_name;
+}
+
+
 
 // MET NOrway Vorhersage visualisieren
 async function showForecast(latlng) {
