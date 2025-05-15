@@ -35,7 +35,7 @@ async function getPlaceName(latlng) {
     let url = `https://nominatim.openstreetmap.org/reverse?lat=${latlng.lat}&lon=${latlng.lng}&zoom=15&format=jsonv2`
     let response = await fetch(url);
     let jsondata = await response.json();
-    
+    console.log(jsondata);
     return jsondata.display_name;
 }
 
