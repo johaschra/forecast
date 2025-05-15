@@ -31,9 +31,16 @@ L.control.scale({
 }).addTo(map);
 
 
+// MET NOrway Vorhersage visualisieren
+async function showForecast(latlng) {
+    console.log("Popup erzeugen bei:", latlng);
+}
+
 // auf Kartenklick reagieren
 map.on("click", function(evt) {
     console.log(evt.latlng);
+    let url = `https://api.met.no/weatherapi/locationforecast/2.0/compact?lat=${latlng.lat}&lon=${latlng.lng}`;
+    showForecast(evt.latlng);
 })
 
 // Klick auf Innsbruck simulieren
