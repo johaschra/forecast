@@ -37,17 +37,17 @@ async function showForecast(latlng) {
     let url = `https://api.met.no/weatherapi/locationforecast/2.0/compact?lat=${latlng.lat}&lon=${latlng.lng}`;
     let response = await fetch(url);
     let jsondata = await response.json();
-    //console.log(jsondata);
+    console.log(jsondata);
+    let details  = jsondata.properties.timeseries[0].data.instant.details;
     //Popup erzeugen
     let markup = `
     <ul>
-        <li>Luftdruck (hPa): air_pressure_at_sea_level</li>
-        <li>Lufttemperature (°C): air_temperature</li>
-        <li>Bewölkungsgrad (%): cloud_area_fraction</li>
-        <li>Luftfeuchtigkeit: relative_humidity</li>
-        <li>Windrichtung (°): wind_from_direction</li>
-        <li>Windgeschwindigkeit (km/h): wind_speed</li>
-        
+        <li>Luftdruck (hPa): ${details.air_pressure_at_sea_level}</li>
+        <li>Lufttemperature (°C): ${details.air_temperature}</li>
+        <li>Bewölkungsgrad (%): ${details.cloud_area_fraction}</li>
+        <li>Luftfeuchtigkeit: ${details.relative_humidity}</li>
+        <li>Windrichtung (°): ${details.wind_from_direction}</li>
+        <li>Windgeschwindigkeit (km/h): ${details.wind_speed*3.6}</li>
     </ul>`
 
     
